@@ -1,0 +1,83 @@
+rules:
+  - id: unsafe-torch-load
+    patterns:
+      - pattern: torch.load($PATH, ...)
+      - pattern-not: torch.load($PATH, ..., weights_only=True, ...)
+    message: "torch.load without weights_only=True uses pickle and can execute arbitrary code. This is a critical security risk if loading untrusted model files."
+    severity: ERROR
+    languages: [python]
+    metadata:
+      category: security
+      cwe: "CWE-502: Deserialization of Untrusted Data"
+      impact: HIGH
+      likelihood: MEDIUM
+      
+  - id: unsafe-torch-save
+    pattern: torch.save($DATA, $PATH)
+    message: "torch.save uses pickle serialization without integrity protection. Consider adding checksum validation and metadata to detect tampering."
+    severity: WARNING
+    languages: [python]
+    metadata:
+      category: security
+      cwe: "CWE-353: Missing Support for Integrity Check"
+      impact: MEDIUM
+      likelihood: MEDIUM
+      
+  - id: unvalidated-dataset-download
+    patterns:
+      - pattern: datasets.$DATASET(..., download=True, ...)
+      - pattern-not: datasets.$DATASET(..., download=False, ...)
+    message: "Dataset downloaded without integrity validation. Implement checksum verification to prevent data poisoning attacks."
+    severity: WARNING
+    languages: [python]
+    metadata:
+      category: security
+      cwe: "CWE-494: Download of Code Without Integrity Check"
+      impact: HIGH
+      likelihood: LOW
+      
+  - id: hardcoded-file-path
+    patterns:
+      - pattern: open($PATH, ...)
+      - metavariable-regex:
+          metavariable: $PATH
+          regex: ^['"].*['"]$
+    message: "Hardcoded file path detected. Use configurable paths with validation to prevent path traversal and improve security."
+    severity: INFO
+    languages: [python]
+    metadata:
+      category: security
+      cwe: "CWE-22: Path Traversal"
+      impact: MEDIUM
+      likelihood: LOW
+      
+  - id: file-write-without-validation
+    patterns:
+      - pattern: |
+          with open($PATH, 'w') as $F:
+            ...
+      - pattern-not-inside: |
+          try:
+            ...
+          except:
+            ...
+    message: "File write operation without error handling. Add try-except blocks to handle IOError and implement atomic writes to prevent data corruption."
+    severity: INFO
+    languages: [python]
+    metadata:
+      category: security
+      cwe: "CWE-755: Improper Handling of Exceptional Conditions"
+      impact: LOW
+      likelihood: MEDIUM
+      
+  - id: model-load-without-size-check
+    pattern: torch.load($PATH, ...)
+    message: "Loading model file without size validation. Extremely large files could cause denial of service. Validate file size before loading."
+    severity: INFO
+    languages: [python]
+    metadata:
+      category: security
+      cwe: "CWE-400: Uncontrolled Resource Consumption"
+      impact: MEDIUM
+      likelihood: LOW
+
