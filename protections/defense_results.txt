@@ -1,0 +1,91 @@
+ADVERSARIAL TRAINING DEFENSE (BLUE TEAM)
+======================================================================
+
+DEFENSE STRATEGY
+----------------------------------------------------------------------
+Adversarial Training: Train the model on both clean and adversarial
+examples to make it robust against gradient-based attacks.
+
+Training Configuration:
+  - Epochs: 5
+  - Adversarial Method: FGSM
+  - Epsilon: 0.3
+  - Each batch: 50% clean data + 50% adversarial data
+
+PERFORMANCE COMPARISON
+----------------------------------------------------------------------
+Model                     Clean           FGSM            PGD            
+----------------------------------------------------------------------
+Baseline (No Defense)     99.21           81.54           53.02          
+Adversarial Training      99.32           96.96           95.31          
+
+IMPROVEMENT METRICS
+----------------------------------------------------------------------
+Clean Data: +0.11% (maintained)
+FGSM Robustness: +15.42% (improved)
+PGD Robustness: +42.29% (improved)
+
+DETAILED RESULTS - ADVERSARIAL TRAINED MODEL
+----------------------------------------------------------------------
+
+Clean Test Data:
+  Accuracy: 99.32%
+  Loss: 0.0204
+  Correct: 9932/10000
+
+FGSM Attack (epsilon=0.3):
+  Accuracy: 96.96%
+  Correct: 9696/10000
+  Attack Success Rate: 3.04%
+
+PGD Attack (epsilon=0.3, 40 iterations):
+  Accuracy: 95.31%
+  Correct: 9531/10000
+  Attack Success Rate: 4.69%
+
+CONFUSION MATRIX - FGSM ATTACK
+----------------------------------------------------------------------
+          0      1      2      3      4      5      6      7      8      9 
+  0     968      0      1      1      0      1      6      0      3      0 
+  1       0   1127      3      1      0      2      1      1      0      0 
+  2       2      2   1008      6      2      0      0      9      3      0 
+  3       0      0      6    985      0      9      0      7      3      0 
+  4       0      1      4      1    945      0      3      3      3     22 
+  5       2      0      0     20      0    846     10      1      8      5 
+  6       6      4      2      0      4      7    932      0      3      0 
+  7       0      6     17      4      0      0      0    990      1     10 
+  8       5      1      7      4      1      3      2      2    940      9 
+  9       4      4      1      7     12      8      0      9      9    955 
+
+CONFUSION MATRIX - PGD ATTACK
+----------------------------------------------------------------------
+          0      1      2      3      4      5      6      7      8      9 
+  0     959      0      5      1      3      2      6      0      4      0 
+  1       0   1116      3      4      0      4      2      3      3      0 
+  2       2      3    998     11      3      0      0     10      5      0 
+  3       0      0      9    975      0     12      0      8      5      1 
+  4       0      3      7      1    924      0      4      6      5     32 
+  5       3      0      0     32      0    822     12      3     15      5 
+  6       9      5      3      1      6     13    917      0      4      0 
+  7       2      7     26      7      0      0      0    967      2     17 
+  8       6      1     12      7      7      4      3      3    920     11 
+  9       4      5      1     10     21     11      0     11     13    933 
+
+ATTACK SUCCESS RATE COMPARISON
+----------------------------------------------------------------------
+Attack Type          Baseline             Adversarial Training
+----------------------------------------------------------------------
+FGSM                 18.46                3.04                
+PGD                  46.98                4.69                
+
+INTERPRETATION
+----------------------------------------------------------------------
+Adversarial training is a defense technique where the model is trained
+on adversarial examples during the training process. This helps the model
+learn robust features that are less sensitive to adversarial perturbations.
+
+The model showed significant improvement against FGSM attacks (+15.42%).
+The model showed significant improvement against PGD attacks (+42.29%).
+
+Tradeoff: Adversarial training may slightly reduce clean accuracy
+but significantly improves robustness against adversarial attacks.
